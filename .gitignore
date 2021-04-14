@@ -1,6 +1,7 @@
 #kdev
 kdev4/
 *.kdev4
+*.kate-swp
 
 gen-dataset
 build/
