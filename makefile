@@ -23,6 +23,10 @@ $(OBJECT_FILES): build/%.o : src/impl/%.cpp $(HEADER_FILES)
 	mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) -c $(patsubst build/%.o, src/impl/%.cpp, $@) -o $@
 
+clean:
+	rm -rf build
+	rm $(TARGET)
+
 install: all
 	install -m 755 $(TARGET) $(DESTDIR)$(PREFIX)
 
