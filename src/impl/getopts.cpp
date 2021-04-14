@@ -7,6 +7,7 @@
 extern "C"{
 	#include <getopt.h>
 	#include <unistd.h>
+	#include <sys/stat.h>
 }
 
 static void usage(void){
@@ -168,25 +169,37 @@ Options get_opts(int argc, char *argv[]){
 	
 	check_opts(opts);
 	
-	if(optind != argc){
-		int res = chdir(argv[optind]);
-		if(res){
-			int error = errno;
-			std::cerr << "Error changing directory to " << argv[optind] << ": " << strerror(error) << std::endl;
-			exit(EXIT_FAILURE);
-		}
-	}
-	
+	bool path_passed = (optind != argc);
 	char pwd[PATH_MAX];
 	if(getcwd(pwd, sizeof(pwd)) == nullptr){
 		int error = errno;
 		std::cerr << "Error getting current directory : " << strerror(error) << std::endl;
 		exit(EXIT_FAILURE);
 	}
-	std::cout << "Create " << opts.count << " files in " << pwd << "? [y/N] ";
+	
+	std::string dest_name = (path_passed)? argv[optind] : pwd;
+	std::cout << "Create " << opts.count << " files in " << dest_name << "? [y/N] ";
 	char response = getchar();
 	if(!(response == 'y' || response == 'Y'))
 		exit(EXIT_SUCCESS);
+	
+	if(path_passed){
+		int res;
+		res = mkdir(argv[optind], 0755);
+		if(res){
+			int error = errno;
+			if(error != EEXIST){
+				std::cerr << "Error creating directory " << argv[optind] << ": " << strerror(error) << std::endl;
+				exit(EXIT_FAILURE);
+			}
+		}
+		res = chdir(argv[optind]);
+		if(res){
+			int error = errno;
+			std::cerr << "Error changing directory to " << argv[optind] << ": " << strerror(error) << std::endl;
+			exit(EXIT_FAILURE);
+		}
+	}
 	
 	return opts;
 }
