@@ -178,8 +178,15 @@ Options get_opts(int argc, char *argv[]){
 	}
 	
 	char pwd[PATH_MAX];
-	if(getcwd(pwd, sizeof(pwd)) != nullptr)
-		std::cout << "Working directory: " << pwd << std::endl;
+	if(getcwd(pwd, sizeof(pwd)) == nullptr){
+		int error = errno;
+		std::cerr << "Error getting current directory : " << strerror(error) << std::endl;
+		exit(EXIT_FAILURE);
+	}
+	std::cout << "Create " << opts.count << " files in " << pwd << "? [y/N] ";
+	char response = getchar();
+	if(!(response == 'y' || response == 'Y'))
+		exit(EXIT_SUCCESS);
 	
 	return opts;
 }
