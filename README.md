@@ -5,6 +5,7 @@ A command line tool to quickly generate a lot of files in a lot of directories.
 ### Precompiled Static Binary
 ```sh
 sudo curl https://github.com/joshuaboud/gen-dataset/releases/download/v1.0/gen-dataset -o /usr/local/bin/gen-dataset
+sudo chmod +x /usr/local/bin/gen-dataset
 ```
 ### From Source
 Install boost development libraries then
