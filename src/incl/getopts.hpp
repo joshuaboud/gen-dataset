@@ -25,6 +25,7 @@ struct Options{
 	int count = -1;
 	int size = 0;
 	int max_wait_ms = 0;
+	int threads = 1;
 	bool no_prompt = false;
 };
 

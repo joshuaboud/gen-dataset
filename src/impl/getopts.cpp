@@ -32,7 +32,7 @@ static void usage(void){
 	std::cout << 
 	"gen-dataset Copyright (C) 2021 Josh Boudreau <jboudreau@45drives.com>\n"
 	"usage:\n"
-	"  gen-dataset -d -b -c [-s -w] [path]\n"
+	"  gen-dataset -d -b -c [-s -w -t] [path]\n"
 	"\n"
 	"flags:\n"
 	"  -d, --depth <int>                 - number of directory levels\n"
@@ -40,6 +40,7 @@ static void usage(void){
 	"  -c, --count <int>                 - total number of files to create\n"
 	"  -s, --size <float [K..T][i]B>     - file size\n"
 	"  -w, --max-wait <float (seconds)>  - max random wait between file creation\n"
+	"  -t, --threads <int>               - number of parallel file creation threads\n"
 	"  -y, --yes                         - don't prompt before creating files\n"
 	<< std::endl;
 }
@@ -109,6 +110,10 @@ static void check_opts(const Options &opts){
 		std::cerr << "Invalid max random wait: " << opts.max_wait_ms << std::endl;
 		errors = true;
 	}
+	if(opts.count < 1){
+		std::cerr << "Invalid number of threads: " << opts.count << std::endl;
+		errors = true;
+	}
 	if(errors)
 		exit(EXIT_FAILURE);
 }
@@ -135,12 +140,13 @@ Options get_opts(int argc, char *argv[]){
 		{"--count",          required_argument, 0, 'c'},
 		{"--size",           required_argument, 0, 's'},
 		{"--max-wait",       required_argument, 0, 'w'},
+		{"--threads",        required_argument, 0, 't'},
 		{"--yes",            no_argument,       0, 'y'},
 		{"--help",           no_argument,       0, 'h'},
 		{0, 0, 0, 0}
 	};
 	
-	while((opt = getopt_long(argc, argv, "d:b:c:s:w:yh", long_options, &option_ind)) != -1){
+	while((opt = getopt_long(argc, argv, "d:b:c:s:w:t:yh", long_options, &option_ind)) != -1){
 		switch(opt){
 			case 'd':
 				try{
@@ -177,6 +183,15 @@ Options get_opts(int argc, char *argv[]){
 					opts.max_wait_ms = int(std::stod(optarg) * 1000.0);
 				}catch(const std::invalid_argument &){
 					std::cerr << "Invalid max random wait. Must be floating point." << std::endl;
+					usage();
+					exit(EXIT_FAILURE);
+				}
+				break;
+			case 't':
+				try{
+					opts.threads = std::stoi(optarg);
+				}catch(const std::invalid_argument &){
+					std::cerr << "Invalid number of threads. Must be integer." << std::endl;
 					usage();
 					exit(EXIT_FAILURE);
 				}
