@@ -3,18 +3,26 @@ A command line tool to quickly generate a lot of files in a lot of directories.
 
 ## Installation
 ### Precompiled Static Binary
-```sh
-sudo curl https://github.com/joshuaboud/gen-dataset/releases/download/v1.0/gen-dataset -o /usr/local/bin/gen-dataset
-sudo chmod +x /usr/local/bin/gen-dataset
-```
+* Download Binary
+  - curl
+  ```sh
+  sudo curl https://github.com/joshuaboud/gen-dataset/releases/download/v1.0/gen-dataset -o /usr/local/bin/gen-dataset
+  ```
+  - wget
+  ```sh
+  sudo wget https://github.com/joshuaboud/gen-dataset/releases/download/v1.0/gen-dataset -P /usr/local/bin
+  ```
+* Mark Executable
+  - `sudo chmod +x /usr/local/bin/gen-dataset`
 ### From Source
-Install boost development libraries then
-```sh
-git clone https://github.com/joshuaboud/gen-dataset.git
-cd gen-dataset
-make -j8
-sudo make install
-```
+* Install Boost Development Libraries
+* Get Source and Install
+  ```sh
+  git clone https://github.com/joshuaboud/gen-dataset.git
+  cd gen-dataset
+  make -j8
+  sudo make install
+  ```
 
 ### Usage
 ```
