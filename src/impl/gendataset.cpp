@@ -134,7 +134,7 @@ void touch_files(std::string *file_names, int count, int size, int max_wait_ms){
 void gen_dataset(const Options &opts){
 	std::string *dir_names = gen_dir_names(opts.branches);
 	gen_dirs(opts.depth, opts.branches, dir_names, "");
-	std::string *file_names = gen_file_paths(opts.depth, opts.branches, opts.count, dir_names);
+	std::string *file_names = gen_file_paths(opts.depth+1, opts.branches, opts.count, dir_names);
 	touch_files(file_names, opts.count, opts.size, opts.max_wait_ms);
 	delete[] file_names;
 	delete[] dir_names;
