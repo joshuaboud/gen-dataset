@@ -110,8 +110,8 @@ static void check_opts(const Options &opts){
 		std::cerr << "Invalid max random wait: " << opts.max_wait_ms << std::endl;
 		errors = true;
 	}
-	if(opts.count < 1){
-		std::cerr << "Invalid number of threads: " << opts.count << std::endl;
+	if(opts.threads < 1){
+		std::cerr << "Invalid number of threads: " << opts.threads << std::endl;
 		errors = true;
 	}
 	if(errors)
