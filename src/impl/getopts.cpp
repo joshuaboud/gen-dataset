@@ -95,6 +95,16 @@ static void check_opts(const Options &opts){
 		exit(EXIT_FAILURE);
 }
 
+int calc_total_dirs(int depth, int branches){
+	int sum = 0;
+	
+	for(int i = 0; i < depth; ++i){
+		sum += pow(branches, i+1);
+	}
+	
+	return sum;
+}
+
 Options get_opts(int argc, char *argv[]){
 	int opt;
 	int option_ind = 0;
@@ -177,8 +187,10 @@ Options get_opts(int argc, char *argv[]){
 			exit(EXIT_FAILURE);
 		}
 		
+		int total_dirs = calc_total_dirs(opts.depth, opts.branches);
+		
 		std::string dest_name = (path_passed)? argv[optind] : pwd;
-		std::cout << "Create " << opts.count << " files in " << dest_name << "? [y/N] ";
+		std::cout << "Create " << total_dirs << " directories and " << opts.count << " files in " << dest_name << "? [y/N] ";
 		char response = getchar();
 		if(!(response == 'y' || response == 'Y'))
 			exit(EXIT_SUCCESS);
