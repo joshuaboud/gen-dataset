@@ -9,6 +9,10 @@
 #include <cstring>
 #include <cmath>
 #include <algorithm>
+#include <boost/random/mersenne_twister.hpp>
+#include <boost/random/discrete_distribution.hpp>
+
+boost::mt19937 gen;
 
 extern "C" {
 	#include <sys/stat.h>
@@ -41,12 +45,26 @@ void gen_dirs(int depth, int branches, std::string *dir_names, std::string curr_
 	}
 }
 
+boost::random::discrete_distribution<> get_geometric_biased_rand_generator(int depth, int branches){
+	std::vector<double> probabilities(depth, 0.0);
+	
+	double base_prob = (1.0 - double(branches)) / (1.0 - pow(branches, depth));
+	
+	for(double i = 0.0; i < depth; i += 1.0){
+		probabilities[i] = pow(branches, i) * base_prob;
+	}
+	
+	boost::random::discrete_distribution<> dist(probabilities);
+	return dist;
+}
+
 std::string *gen_file_paths(int depth, int branches, int count, std::string *dir_names){
 	std::string *file_names = new std::string[count];
 	srand(time(NULL));
+	boost::random::discrete_distribution<> biased_depth = get_geometric_biased_rand_generator(depth, branches);
 	for(int i = 0; i < count; ++i){
 		file_names[i] = "";
-		int depth_placement = rand() % depth;
+		int depth_placement = biased_depth(gen);
 		for(int j = 0; j < depth_placement; ++j){
 			int branch_choice = rand() % branches;
 			file_names[i] += dir_names[branch_choice];
@@ -111,7 +129,7 @@ void touch_files(std::string *file_names, int count, int size){
 void gen_dataset(const Options &opts){
 	std::string *dir_names = gen_dir_names(opts.branches);
 	gen_dirs(opts.depth, opts.branches, dir_names, "");
-	std::string *file_names = gen_file_paths(opts.depth + 1, opts.branches, opts.count, dir_names);
+	std::string *file_names = gen_file_paths(opts.depth, opts.branches, opts.count, dir_names);
 	touch_files(file_names, opts.count, opts.size);
 	delete[] file_names;
 	delete[] dir_names;

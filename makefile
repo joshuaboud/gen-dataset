@@ -1,5 +1,5 @@
 TARGET = gen-dataset
-LIBS = -lpthread
+LIBS = -lboost_random
 CC = g++
 CFLAGS = -std=c++11 -g -O2 -Wall -Isrc/incl
 
