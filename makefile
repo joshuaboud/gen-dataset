@@ -16,6 +16,9 @@ endif
 default: $(TARGET)
 all: default
 
+static: LIBS := -static $(LIBS)
+static: default
+
 $(TARGET): $(OBJECT_FILES)
 	$(CC) $(OBJECT_FILES) -Wall $(LIBS) -o $@
 
