@@ -144,7 +144,7 @@ Options get_opts(int argc, char *argv[]){
 				break;
 			case 'w':
 				try{
-					opts.branches = std::stoi(optarg);
+					opts.max_wait = std::stoi(optarg);
 				}catch(const std::invalid_argument &){
 					std::cerr << "Invalid max random wait. Must be integer." << std::endl;
 					usage();

@@ -9,6 +9,7 @@
 #include <cstring>
 #include <cmath>
 #include <algorithm>
+#include <thread>
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/random/discrete_distribution.hpp>
 
@@ -74,7 +75,7 @@ std::string *gen_file_paths(int depth, int branches, int count, std::string *dir
 	return file_names;
 }
 
-void touch_files(std::string *file_names, int count, int size){
+void touch_files(std::string *file_names, int count, int size, int max_wait){
 	if(size){
 		// create and write
 		int buff_sz = std::min(size, 1024 * 1024);
@@ -105,6 +106,8 @@ void touch_files(std::string *file_names, int count, int size){
 				std::cerr << "Error closing file: " << strerror(error) << std::endl;
 				exit(EXIT_FAILURE);
 			}
+			if(max_wait)
+				std::this_thread::sleep_for(std::chrono::seconds(rand() % (max_wait+1)));
 		}
 		delete[] buff;
 	}else{
@@ -122,6 +125,8 @@ void touch_files(std::string *file_names, int count, int size){
 				std::cerr << "Error closing file: " << strerror(error) << std::endl;
 				exit(EXIT_FAILURE);
 			}
+			if(max_wait)
+				std::this_thread::sleep_for(std::chrono::seconds(rand() % (max_wait+1)));
 		}
 	}
 }
@@ -130,7 +135,7 @@ void gen_dataset(const Options &opts){
 	std::string *dir_names = gen_dir_names(opts.branches);
 	gen_dirs(opts.depth, opts.branches, dir_names, "");
 	std::string *file_names = gen_file_paths(opts.depth, opts.branches, opts.count, dir_names);
-	touch_files(file_names, opts.count, opts.size);
+	touch_files(file_names, opts.count, opts.size, opts.max_wait);
 	delete[] file_names;
 	delete[] dir_names;
 }
