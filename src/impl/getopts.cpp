@@ -11,14 +11,23 @@ extern "C"{
 }
 
 static void usage(void){
-	std::cout << "gen-dataset Copyright (C) 2021 Josh Boudreau <jboudreau@45drives.com>" << std::endl;
-	std::cout << "usage:" << std::endl;
-	std::cout << "  gen-dataset -d <depth> -b <branches per node> -c <# files> [-s <file size> -m <max random wait>]" << std::endl;
+	std::cout << 
+	"gen-dataset Copyright (C) 2021 Josh Boudreau <jboudreau@45drives.com>\n"
+	"usage:\n"
+	"  gen-dataset -d -b -c [-s -m] [path]\n"
+	"\n"
+	"flags:\n"
+	"  -d, --depth <int>               - number of directory levels\n"
+	"  -b, --branches <int>            - number of subdirectories per directory\n"
+	"  -c, --count <int>               - total number of files to create\n"
+	"  -s, --size <float [K..T][i]B>   - file size (optional)\n"
+	"  -m, --max-wait <int (seconds)>  - max random wait between file creations (optional)"
+	<< std::endl;
 }
 
 static int parse_size(const std::string &arg){
 	std::smatch m;
-	if(regex_search(arg, m, std::regex("^(\\d+)\\s*([kKmMgGtTpPeEzZyY]?)(i?)[bB]$"))){
+	if(regex_search(arg, m, std::regex("^(\\d+)\\s*([kmgt]?)(i?)b?$", std::regex_constants::icase))){
 		double num;
 		try{
 			num = std::stod(m[1]);
@@ -48,22 +57,6 @@ static int parse_size(const std::string &arg){
 			case 't':
 			case 'T':
 				exp = 4.0;
-				break;
-			case 'p':
-			case 'P':
-				exp = 5.0;
-				break;
-			case 'e':
-			case 'E':
-				exp = 6.0;
-				break;
-			case 'z':
-			case 'Z':
-				exp = 7.0;
-				break;
-			case 'y':
-			case 'Y':
-				exp = 8.0;
 				break;
 			default:
 				std::cerr << "Invalid file size. Must be # [kKmMgGtT][i]B." << std::endl;
