@@ -13,7 +13,9 @@ A command line tool to quickly generate a lot of files in a lot of directories.
   sudo wget https://github.com/joshuaboud/gen-dataset/releases/download/v1.0/gen-dataset -P /usr/local/bin
   ```
 * Mark Executable
-  - `sudo chmod +x /usr/local/bin/gen-dataset`
+  ```sh
+  sudo chmod +x /usr/local/bin/gen-dataset
+  ```
 ### From Source
 * Install Boost Development Libraries
 * Get Source and Install
