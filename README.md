@@ -18,7 +18,7 @@ sudo make install
 ### Usage
 ```
 usage:
-  gen-dataset -d -b -c [-s -w] [path]
+  gen-dataset -d -b -c [-s -w -t] [path]
 
 flags:
   -d, --depth <int>                 - number of directory levels
@@ -26,6 +26,7 @@ flags:
   -c, --count <int>                 - total number of files to create
   -s, --size <float [K..T][i]B>     - file size
   -w, --max-wait <float (seconds)>  - max random wait between file creation
+  -t, --threads <int>               - number of parallel file creation threads
   -y, --yes                         - don't prompt before creating files
 ```
 #### Example
@@ -37,3 +38,8 @@ Simulate real usage by randomly waiting up to 2.5 seconds between file creations
 ```sh
 gen-dataset -d 4 -b 6 -c 1000 -s 1MiB -w 2.5
 ```
+Generate 1,000,000 empty files in 55986 directories with 16 threads writing the files:
+```sh
+gen-dataset -d 6 -b 6 -c 1000000 -t 16
+```
+
