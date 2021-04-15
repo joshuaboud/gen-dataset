@@ -1,5 +1,5 @@
 TARGET = gen-dataset
-LIBS = -lboost_random
+LIBS = -lboost_random -lpthread
 CC = g++
 CFLAGS = -std=c++11 -g -O2 -Wall -Isrc/incl
 
@@ -16,7 +16,7 @@ endif
 default: $(TARGET)
 all: default
 
-static: LIBS := -static $(LIBS)
+static: LIBS = -static -lboost_random -Wl,--whole-archive -lpthread -Wl,--no-whole-archive
 static: default
 
 $(TARGET): $(OBJECT_FILES)
