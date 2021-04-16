@@ -21,6 +21,7 @@
 #include "getopts.hpp"
 #include <string>
 #include <iostream>
+#include <iomanip>
 #include <climits>
 #include <cstdlib>
 #include <ctime>
@@ -28,6 +29,7 @@
 #include <cmath>
 #include <algorithm>
 #include <thread>
+#include <atomic>
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/random/discrete_distribution.hpp>
 
@@ -38,6 +40,11 @@ extern "C" {
 	#include <fcntl.h>
 	#include <unistd.h>
 }
+
+struct Status{
+	std::atomic<bool> running;
+	std::atomic<int> number_created;
+};
 
 std::string *gen_dir_names(int branches){
 	std::string *dir_names = new std::string[branches];
@@ -77,10 +84,10 @@ boost::random::discrete_distribution<> get_geometric_biased_rand_generator(int d
 	return dist;
 }
 
-void gen_file_paths(std::vector<std::string> &file_names, int depth, int branches, int count, std::string *dir_names){
+void gen_file_paths(std::vector<std::string> &file_names, int depth, int branches, long int count, std::string *dir_names){
 	srand(time(NULL));
 	boost::random::discrete_distribution<> biased_depth = get_geometric_biased_rand_generator(depth, branches);
-	for(int i = 0; i < count; ++i){
+	for(long int i = 0; i < count; ++i){
 		file_names[i] = "";
 		int depth_placement = biased_depth(gen);
 		for(int j = 0; j < depth_placement; ++j){
@@ -120,15 +127,16 @@ inline void create_file(const char *name, const unsigned char *buff, int buff_sz
 	}
 }
 
-void touch_files(const std::vector<std::string> &file_names, const unsigned char *buff, int buff_sz, int file_sz, int max_wait_ms){
+void touch_files(const std::vector<std::string> &file_names, const unsigned char *buff, int buff_sz, int file_sz, int max_wait_ms, Status &status){
 	for(const std::string &file_name : file_names){
 		create_file(file_name.c_str(), buff, buff_sz, file_sz);
+		status.number_created++;
 		if(max_wait_ms)
 			std::this_thread::sleep_for(std::chrono::milliseconds(rand() % (max_wait_ms+1)));
 	}
 }
 
-void launch_threads(int num_threads, const std::vector<std::string> &file_names, const unsigned char *buff, int buff_sz, int file_sz, int max_wait_ms){
+void launch_threads(int num_threads, const std::vector<std::string> &file_names, const unsigned char *buff, int buff_sz, int file_sz, int max_wait_ms, Status &status){
 	std::vector<std::vector<std::string>> partitions(
 		num_threads,
 		std::vector<std::string>()
@@ -141,11 +149,32 @@ void launch_threads(int num_threads, const std::vector<std::string> &file_names,
 	}
 	std::vector<std::thread> threads;
 	for(const std::vector<std::string> &partition : partitions){
-		threads.emplace_back(touch_files, partition, buff, buff_sz, file_sz, max_wait_ms);
+		threads.emplace_back(touch_files, partition, buff, buff_sz, file_sz, max_wait_ms, std::ref(status));
 	}
 	for(std::thread &thread : threads){
 		thread.join();
 	}
+}
+
+void report_status(const Status &status, long int count){
+	long int num_created = 0;
+	const int prog_bar_w = 40;
+	std::string prog_bar(prog_bar_w, ' ');
+	int prog_ind = 0;
+	int next_ind = 0;
+	while(status.running || num_created != count){
+		num_created = status.number_created;
+		std::cout << "Files created: " << num_created << '/' << count << std::endl;
+		next_ind = (num_created * (prog_bar_w-1) / count);
+		while(prog_ind < next_ind){
+			prog_bar[prog_ind++] = '=';
+		}
+		prog_bar[prog_ind] = '>';
+		std::cout << "[" << prog_bar << "]" << std::endl;
+		std::this_thread::sleep_for(std::chrono::milliseconds(20));
+		std::cout << "\033[2A\r";
+	}
+	std::cout << std::endl << std::endl;
 }
 
 void gen_dataset(const Options &opts){
@@ -160,10 +189,16 @@ void gen_dataset(const Options &opts){
 		buff = new unsigned char[buff_sz];
 		memset(buff, 0, buff_sz*sizeof(unsigned char));
 	}
+	Status status;
+	status.running = true;
+	status.number_created = 0;
+	std::thread status_thread(report_status, std::ref(status), opts.count);
 	if(opts.threads > 1)
-		launch_threads(opts.threads, file_names, buff, buff_sz, opts.size, opts.max_wait_ms);
+		launch_threads(opts.threads, file_names, buff, buff_sz, opts.size, opts.max_wait_ms, std::ref(status));
 	else
-		touch_files(file_names, buff, buff_sz, opts.size, opts.max_wait_ms);
+		touch_files(file_names, buff, buff_sz, opts.size, opts.max_wait_ms, std::ref(status));
+	status.running = false;
+	status_thread.join();
 	if(opts.size)
 		delete[] buff;
 	delete[] dir_names;
