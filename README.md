@@ -9,11 +9,11 @@ Biasing the distribution this way ensures that each directory has a similar numb
 * Download Binary
   - curl
   ```sh
-  sudo curl https://github.com/joshuaboud/gen-dataset/releases/download/v1.0/gen-dataset -o /usr/local/bin/gen-dataset
+  sudo curl https://github.com/joshuaboud/gen-dataset/releases/download/v1.1/gen-dataset -o /usr/local/bin/gen-dataset
   ```
   - wget
   ```sh
-  sudo wget https://github.com/joshuaboud/gen-dataset/releases/download/v1.0/gen-dataset -P /usr/local/bin
+  sudo wget https://github.com/joshuaboud/gen-dataset/releases/download/v1.1/gen-dataset -P /usr/local/bin
   ```
 * Mark Executable
   ```sh
