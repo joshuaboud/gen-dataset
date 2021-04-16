@@ -118,8 +118,8 @@ static void check_opts(const Options &opts){
 		exit(EXIT_FAILURE);
 }
 
-int calc_total_dirs(int depth, int branches){
-	int sum = 0;
+long int calc_total_dirs(int depth, int branches){
+	long int sum = 0;
 	
 	for(int i = 0; i < depth; ++i){
 		sum += pow(branches, i+1);
@@ -168,7 +168,7 @@ Options get_opts(int argc, char *argv[]){
 				break;
 			case 'c':
 				try{
-					opts.count = std::stoi(optarg);
+					opts.count = std::stol(optarg);
 				}catch(const std::invalid_argument &){
 					std::cerr << "Invalid number of files. Must be integer." << std::endl;
 					usage();
@@ -220,7 +220,7 @@ Options get_opts(int argc, char *argv[]){
 			exit(EXIT_FAILURE);
 		}
 		
-		int total_dirs = calc_total_dirs(opts.depth, opts.branches);
+		long int total_dirs = calc_total_dirs(opts.depth, opts.branches);
 		
 		std::string dest_name = (path_passed)? argv[optind] : pwd;
 		std::cout << "Create " << total_dirs << " directories and " << opts.count << " files in " << dest_name << "? [y/N] ";

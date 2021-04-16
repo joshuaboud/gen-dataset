@@ -22,7 +22,7 @@
 struct Options{
 	int depth = -1;
 	int branches = -1;
-	int count = -1;
+	long int count = -1;
 	int size = 0;
 	int max_wait_ms = 0;
 	int threads = 1;
