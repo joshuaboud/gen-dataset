@@ -20,8 +20,8 @@
 #pragma once
 
 struct Options{
-	int depth = -1;
-	int branches = -1;
+	int depth = 0;
+	int branches = 0;
 	long int count = -1;
 	int size = 0;
 	int max_wait_ms = 0;

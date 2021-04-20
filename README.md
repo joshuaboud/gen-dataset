@@ -9,11 +9,11 @@ Biasing the distribution this way ensures that each directory has a similar numb
 * Download Binary
   - curl
   ```sh
-  sudo curl https://github.com/joshuaboud/gen-dataset/releases/download/v1.1/gen-dataset -o /usr/local/bin/gen-dataset
+  sudo curl https://github.com/joshuaboud/gen-dataset/releases/download/v1.2/gen-dataset -o /usr/local/bin/gen-dataset
   ```
   - wget
   ```sh
-  sudo wget https://github.com/joshuaboud/gen-dataset/releases/download/v1.1/gen-dataset -P /usr/local/bin
+  sudo wget https://github.com/joshuaboud/gen-dataset/releases/download/v1.2/gen-dataset -P /usr/local/bin
   ```
 * Mark Executable
   ```sh
@@ -32,18 +32,22 @@ Biasing the distribution this way ensures that each directory has a similar numb
 ### Usage
 ```
 usage:
-  gen-dataset -d -b -c [-s -w -t] [path]
+  gen-dataset  -c [-b -d -s -t -w -y] [path]
 
 flags:
-  -d, --depth <int>                 - number of directory levels
   -b, --branches <int>              - number of subdirectories per directory
   -c, --count <int>                 - total number of files to create
+  -d, --depth <int>                 - number of directory levels
   -s, --size <float [K..T][i]B>     - file size
-  -w, --max-wait <float (seconds)>  - max random wait between file creation
   -t, --threads <int>               - number of parallel file creation threads
+  -w, --max-wait <float (seconds)>  - max random wait between file creation
   -y, --yes                         - don't prompt before creating files
 ```
 #### Example
+Generate 10 1GiB files in a single subdirectory named 'subdir':
+```sh
+gen-dataset -c 10 -s 1GiB subdir
+```
 Generate 10,000 1M files in 3905 directories:
 ```sh
 gen-dataset -d 5 -b 5 -c 10000 -s 1MiB

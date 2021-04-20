@@ -32,15 +32,15 @@ static void usage(void){
 	std::cout << 
 	"gen-dataset Copyright (C) 2021 Josh Boudreau <jboudreau@45drives.com>\n"
 	"usage:\n"
-	"  gen-dataset -d -b -c [-s -w -t] [path]\n"
+	"  gen-dataset -c [-b -d -s -t -w -y] [path]\n"
 	"\n"
 	"flags:\n"
-	"  -d, --depth <int>                 - number of directory levels\n"
 	"  -b, --branches <int>              - number of subdirectories per directory\n"
 	"  -c, --count <int>                 - total number of files to create\n"
+	"  -d, --depth <int>                 - number of directory levels\n"
 	"  -s, --size <float [K..T][i]B>     - file size\n"
-	"  -w, --max-wait <float (seconds)>  - max random wait between file creation\n"
 	"  -t, --threads <int>               - number of parallel file creation threads\n"
+	"  -w, --max-wait <float (seconds)>  - max random wait between file creation\n"
 	"  -y, --yes                         - don't prompt before creating files\n"
 	<< std::endl;
 }
@@ -90,11 +90,11 @@ static int parse_size(const std::string &arg){
 
 static void check_opts(const Options &opts){
 	bool errors = false;
-	if(opts.depth < 1){
+	if(opts.depth < 0){
 		std::cerr << "Invalid depth: " << opts.depth << std::endl;
 		errors = true;
 	}
-	if(opts.branches < 1){
+	if(opts.branches < 0){
 		std::cerr << "Invalid branches: " << opts.branches << std::endl;
 		errors = true;
 	}
