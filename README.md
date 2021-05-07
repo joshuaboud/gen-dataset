@@ -1,7 +1,7 @@
 # gen-dataset
 A command line tool to quickly generate a lot of files in a lot of directories. This tool creates an [M-ary tree](https://en.wikipedia.org/wiki/M-ary_tree)
 shaped directory tree and randomly places any number of files of any size within this tree. The distribution of files per directory is roughly equal. If a size is provided, the files will be filled with zeros up to that size.
-
+![Usage example](doc/example.gif)
 ## Installation
 ### Precompiled Static Binary
 * Download Binary
