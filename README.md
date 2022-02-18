@@ -7,11 +7,11 @@ shaped directory tree and randomly places any number of files of any size within
 * Download Binary
   - curl
   ```sh
-  sudo curl https://github.com/joshuaboud/gen-dataset/releases/download/v1.2/gen-dataset -o /usr/local/bin/gen-dataset
+  sudo curl https://github.com/joshuaboud/gen-dataset/releases/download/v1.3/gen-dataset -o /usr/local/bin/gen-dataset
   ```
   - wget
   ```sh
-  sudo wget https://github.com/joshuaboud/gen-dataset/releases/download/v1.2/gen-dataset -P /usr/local/bin
+  sudo wget https://github.com/joshuaboud/gen-dataset/releases/download/v1.3/gen-dataset -P /usr/local/bin
   ```
 * Mark Executable
   ```sh
@@ -58,4 +58,3 @@ Generate 1,000,000 empty files in 55986 directories with 16 threads writing the 
 ```sh
 gen-dataset -d 6 -b 6 -c 1000000 -t 16
 ```
-
