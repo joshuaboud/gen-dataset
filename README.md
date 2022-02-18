@@ -5,11 +5,6 @@ shaped directory tree and randomly places any number of files of any size within
 ## Installation
 ### Precompiled Static Binary
 * Download Binary
-  - curl
-  ```sh
-  sudo curl https://github.com/joshuaboud/gen-dataset/releases/download/v1.3/gen-dataset -o /usr/local/bin/gen-dataset
-  ```
-  - wget
   ```sh
   sudo wget https://github.com/joshuaboud/gen-dataset/releases/download/v1.3/gen-dataset -P /usr/local/bin
   ```
@@ -30,13 +25,14 @@ shaped directory tree and randomly places any number of files of any size within
 ### Usage
 ```
 usage:
-  gen-dataset  -c [-b -d -s -t -w -y] [path]
+  gen-dataset  -c [-b -d -s -S -t -w -y] [path]
 
 flags:
   -b, --branches <int>              - number of subdirectories per directory
   -c, --count <int>                 - total number of files to create
   -d, --depth <int>                 - number of directory levels
-  -s, --size <float [K..T][i]B>     - file size
+  -s, --size <float[K..T][i]B>      - file size
+  -S, --buff-size <float[K..T][i]B> - write buffer size (default=1M)
   -t, --threads <int>               - number of parallel file creation threads
   -w, --max-wait <float (seconds)>  - max random wait between file creation
   -y, --yes                         - don't prompt before creating files
