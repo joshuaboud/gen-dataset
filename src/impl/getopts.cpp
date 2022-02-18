@@ -45,14 +45,14 @@ static void usage(void){
 	<< std::endl;
 }
 
-static int parse_size(const std::string &arg){
+static unsigned long parse_size(const std::string &arg){
 	std::smatch m;
-	if(regex_search(arg, m, std::regex("^(\\d+)\\s*([kmgt]?)(i?)b?$", std::regex_constants::icase))){
+	if(regex_search(arg, m, std::regex("^(\\d+\\.?\\d*)\\s*([kmgt]?)(i?)b?$", std::regex_constants::icase))){
 		double num;
 		try{
 			num = std::stod(m[1]);
 		}catch(const std::invalid_argument &){
-			std::cerr << "Invalid file size. Must be # [kKmMgGtT][i]B." << std::endl;
+			std::cerr << "Invalid file/buffer size. Must be #[kKmMgGtT][i]B." << std::endl;
 			exit(EXIT_FAILURE);
 		}
 		char prefix = (m.str(2).empty())? 0 : m.str(2).front();
@@ -79,12 +79,17 @@ static int parse_size(const std::string &arg){
 				exp = 4.0;
 				break;
 			default:
-				std::cerr << "Invalid file size. Must be # [kKmMgGtT][i]B." << std::endl;
+				std::cerr << "Invalid file/buffer size. Must be #[kKmMgGtT][i]B." << std::endl;
 				exit(EXIT_FAILURE);
 		}
-		return int(num * pow(base, exp));
+		unsigned long long bytes = num * pow(base, exp);
+		if (bytes > ULONG_MAX) {
+			std::cerr << "File/buffer size too big." << std::endl;
+			exit(EXIT_FAILURE);
+		}
+		return bytes;
 	}
-	std::cerr << "Invalid file size. Must be # [kKmMgGtT][i]B." << std::endl;
+	std::cerr << "Invalid file/buffer size. Must be #[kKmMgGtT][i]B." << std::endl;
 	exit(EXIT_FAILURE);
 }
 
@@ -102,10 +107,6 @@ static void check_opts(const Options &opts){
 		std::cerr << "Invalid count: " << opts.count << std::endl;
 		errors = true;
 	}
-	if(opts.size < 0){
-		std::cerr << "Invalid size: " << opts.size << std::endl;
-		errors = true;
-	}
 	if(opts.max_wait_ms < 0){
 		std::cerr << "Invalid max random wait: " << opts.max_wait_ms << std::endl;
 		errors = true;
@@ -118,8 +119,8 @@ static void check_opts(const Options &opts){
 		exit(EXIT_FAILURE);
 }
 
-long int calc_total_dirs(int depth, int branches){
-	long int sum = 0;
+unsigned long calc_total_dirs(int depth, int branches){
+	unsigned long sum = 0;
 	
 	for(int i = 0; i < depth; ++i){
 		sum += pow(branches, i+1);
@@ -139,6 +140,7 @@ Options get_opts(int argc, char *argv[]){
 		{"--branches",       required_argument, 0, 'b'},
 		{"--count",          required_argument, 0, 'c'},
 		{"--size",           required_argument, 0, 's'},
+		{"--buff-size",      required_argument, 0, 'S'},
 		{"--max-wait",       required_argument, 0, 'w'},
 		{"--threads",        required_argument, 0, 't'},
 		{"--yes",            no_argument,       0, 'y'},
@@ -146,7 +148,7 @@ Options get_opts(int argc, char *argv[]){
 		{0, 0, 0, 0}
 	};
 	
-	while((opt = getopt_long(argc, argv, "d:b:c:s:w:t:yh", long_options, &option_ind)) != -1){
+	while((opt = getopt_long(argc, argv, "d:b:c:s:S:w:t:yh", long_options, &option_ind)) != -1){
 		switch(opt){
 			case 'd':
 				try{
@@ -168,7 +170,7 @@ Options get_opts(int argc, char *argv[]){
 				break;
 			case 'c':
 				try{
-					opts.count = std::stol(optarg);
+					opts.count = std::stoul(optarg);
 				}catch(const std::invalid_argument &){
 					std::cerr << "Invalid number of files. Must be integer." << std::endl;
 					usage();
@@ -178,9 +180,12 @@ Options get_opts(int argc, char *argv[]){
 			case 's':
 				opts.size = parse_size(optarg);
 				break;
+			case 'S':
+				opts.buff_sz = parse_size(optarg);
+				break;
 			case 'w':
 				try{
-					opts.max_wait_ms = int(std::stod(optarg) * 1000.0);
+					opts.max_wait_ms = (unsigned long)(std::stod(optarg) * 1000.0);
 				}catch(const std::invalid_argument &){
 					std::cerr << "Invalid max random wait. Must be floating point." << std::endl;
 					usage();
@@ -220,7 +225,7 @@ Options get_opts(int argc, char *argv[]){
 			exit(EXIT_FAILURE);
 		}
 		
-		long int total_dirs = calc_total_dirs(opts.depth, opts.branches);
+		unsigned long total_dirs = calc_total_dirs(opts.depth, opts.branches);
 		
 		std::string dest_name = (path_passed)? argv[optind] : pwd;
 		std::cout << "Create " << total_dirs << " directories and " << opts.count << " files in " << dest_name << "? [y/N] ";

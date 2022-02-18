@@ -22,9 +22,10 @@
 struct Options{
 	int depth = 0;
 	int branches = 0;
-	long int count = -1;
-	int size = 0;
-	int max_wait_ms = 0;
+	unsigned long count = -1;
+	unsigned long size = 0;
+	unsigned long buff_sz = 1024 * 1024;
+	unsigned long max_wait_ms = 0;
 	int threads = 1;
 	bool no_prompt = false;
 };

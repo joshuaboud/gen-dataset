@@ -98,7 +98,7 @@ void gen_file_paths(std::vector<std::string> &file_names, int depth, int branche
 	}
 }
 
-inline void create_file(const char *name, const unsigned char *buff, int buff_sz, int file_sz){
+inline void create_file(const char *name, const unsigned char *buff, unsigned long buff_sz, unsigned long file_sz){
 	int fd = creat(name, 0777);
 	if(fd == -1){
 		int error = errno;
@@ -107,9 +107,9 @@ inline void create_file(const char *name, const unsigned char *buff, int buff_sz
 		exit(EXIT_FAILURE);
 	}
 	if(buff){
-		int bytes_left = file_sz;
+		unsigned long bytes_left = file_sz;
 		while(bytes_left > 0){
-			int bytes_written = write(fd, buff, std::min(buff_sz, bytes_left));
+			ssize_t bytes_written = write(fd, buff, std::min(buff_sz, bytes_left));
 			if(bytes_written == -1){
 				int error = errno;
 				std::cerr << "Error writing to file: " << strerror(error) << std::endl;
@@ -127,7 +127,7 @@ inline void create_file(const char *name, const unsigned char *buff, int buff_sz
 	}
 }
 
-void touch_files(const std::vector<std::string> &file_names, const unsigned char *buff, int buff_sz, int file_sz, int max_wait_ms, Status &status){
+void touch_files(const std::vector<std::string> &file_names, const unsigned char *buff, unsigned long buff_sz, unsigned long file_sz, unsigned long max_wait_ms, Status &status){
 	for(const std::string &file_name : file_names){
 		create_file(file_name.c_str(), buff, buff_sz, file_sz);
 		status.number_created++;
@@ -136,7 +136,7 @@ void touch_files(const std::vector<std::string> &file_names, const unsigned char
 	}
 }
 
-void launch_threads(int num_threads, const std::vector<std::string> &file_names, const unsigned char *buff, int buff_sz, int file_sz, int max_wait_ms, Status &status){
+void launch_threads(int num_threads, const std::vector<std::string> &file_names, const unsigned char *buff, unsigned long buff_sz, unsigned long file_sz, unsigned long max_wait_ms, Status &status){
 	std::vector<std::vector<std::string>> partitions(
 		num_threads,
 		std::vector<std::string>()
@@ -183,9 +183,11 @@ void gen_dataset(const Options &opts){
 	std::vector<std::string> file_names(opts.count, "");
 	gen_file_paths(file_names, opts.depth+1, opts.branches, opts.count, dir_names);
 	unsigned char *buff = nullptr;
-	int buff_sz = 0;
+	unsigned long buff_sz = opts.buff_sz;
 	if(opts.size){
-		buff_sz = std::min(opts.size, 1024 * 1024);
+		if (opts.size < buff_sz) {
+			buff_sz = opts.size; // limit buffer size to file size
+		}
 		buff = new unsigned char[buff_sz];
 		memset(buff, 0, buff_sz*sizeof(unsigned char));
 	}
